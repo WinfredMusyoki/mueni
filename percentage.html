@@ -1,0 +1,82 @@
+<style type="text/css" media="screen">
+    .blue{color:blue;text-decoration:underline;cursor:pointer;}
+
+    /* Put your CSS styling here */
+
+
+</style>
+
+
+<script type="text/javascript">
+    var theId,id;	
+	
+    function printIt(id)
+    {
+        $("#child").html("");
+		
+        $.get(id+'.json',function(json)
+        { 
+            $(json.indicators).each(function(i, data)
+            {
+                if(data.name==""){$("#child").html("<p style='color:grey;'>no indicators</p>");}
+                var anchor = $("<p></p>").html(data.name);
+                $("#child").append(anchor);
+            });
+        });
+    }   
+	   	
+    $(document).ready(function(){
+        $("#results").append("<h1>INDICATORS</h1>");
+        $.get('../api/indicators/query/'+$(this).val()+'.json', function(json)
+        {
+						     
+            $(json.indicators).each(function(i, data)
+            {
+                theId=data.href;
+								       
+									   
+                var anchor = $("<p class='blue' id='"+theId+"' onclick='javascript:printIt(id)'></p>").append(data.name);
+                                        
+                $("#results").append(anchor);
+										
+                                        
+            });
+        });
+        $("#search").keyup(function(){
+	
+            $("#results").html("");
+            $("#results").append("<h1>INDICATORS</h1>");
+            $("#child").html("");
+            $.get('../api/indicators/query/'+$(this).val()+'.json', function(json)
+            {
+                $(json.indicators).each(function(i, data)
+                {
+									
+                    theId=data.href;
+								       
+									   
+                    var anchor = $("<p class='blue' id='"+theId+"' onclick='javascript:printIt(id)'></p>").append(data.name);
+                                        
+                    $("#results").append(anchor);
+										
+                                        
+                });
+            });
+                        
+        });
+                
+                
+    });
+</script>
+
+<h1> STATISTICS FOR INDICATORS</h1>
+<div style="float:left;height:100%;">
+    <label for="search">Search Criteria</label>
+    <input type="text" id="search" class="search" />
+    <div id="results"></div>
+</div>
+
+<div id="child" style="position:absolute;left:50%;">
+</div>
+<div id="summary" style="background-color:gray; position: absolute;" > 
+</div>
