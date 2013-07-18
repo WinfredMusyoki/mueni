@@ -1,82 +1,159 @@
-<style type="text/css" media="screen">
-    .blue{color:blue;text-decoration:underline;cursor:pointer;}
+<html>
+    <style type="text/css" media="screen">
+        #section1>div{
+            position:absolute;
+            margin-left:500px;
+            margin-top: -75px;
+        }
+        #results{
+            float: right;
+        }
+        /* Put your CSS styling here */
 
-    /* Put your CSS styling here */
 
+    </style>
 
-</style>
-
-
-<script type="text/javascript">
-    var theId,id;	
+    <script type="text/javascript">
+        var theId,id;	
+        notused =[];
+        used=[];
+        IndArray = [];
+        
 	
-    function printIt(id)
-    {
-        $("#child").html("");
-		
-        $.get(id+'.json',function(json)
-        { 
-            $(json.indicators).each(function(i, data)
-            {
-                if(data.name==""){$("#child").html("<p style='color:grey;'>no indicators</p>");}
-                var anchor = $("<p></p>").html(data.name);
-                $("#child").append(anchor);
-            });
-        });
-    }   
-	   	
-    $(document).ready(function(){
-        $("#results").append("<h1>INDICATORS</h1>");
-        $.get('../api/indicators/query/'+$(this).val()+'.json', function(json)
+        function printIt(id)
         {
-						     
-            $(json.indicators).each(function(i, data)
-            {
-                theId=data.href;
-								       
-									   
-                var anchor = $("<p class='blue' id='"+theId+"' onclick='javascript:printIt(id)'></p>").append(data.name);
-                                        
-                $("#results").append(anchor);
-										
-                                        
-            });
-        });
-        $("#search").keyup(function(){
-	
-            $("#results").html("");
-            $("#results").append("<h1>INDICATORS</h1>");
             $("#child").html("");
-            $.get('../api/indicators/query/'+$(this).val()+'.json', function(json)
-            {
+		
+            $.get(id+'.json',function(json)
+            { 
                 $(json.indicators).each(function(i, data)
                 {
-									
+                    if(data.name==""){$("#child").html("<p style='color:grey;'>no indicators</p>");}
+                    var anchor = $("<p></p>").html(data.name);
+                    $("#child").append(anchor);
+                });
+            });
+        }   
+	   	
+        function search2(){
+            $("#results").append("<h1>INDICATORS</h1>");
+            $.get('../api/indicators/query/'+'.json', function(json)
+            {
+						     
+                $(json.indicators).each(function(i, data)
+                {
                     theId=data.href;
 								       
 									   
                     var anchor = $("<p class='blue' id='"+theId+"' onclick='javascript:printIt(id)'></p>").append(data.name);
                                         
                     $("#results").append(anchor);
+                    anchor.bind("click",function(e){
+                        e.preventDefault();
+                        $.get($(this).attr("href")+".json", function(json){
+                            $(json.indicators).each(function(i, d){
+                                var anchor = $("<a></a>").attr("href","#").attr("id",d.name.replace(' ','_')).append(d.name);
+                                alert($(json.indicators).length);
+                                $("#section1").append(anchor).append("<br/>");
+
+                            });
+
+                        });
+                    });
 										
                                         
                 });
             });
+            $("#search").keyup(function(){
+	
+                $("#results").html("");
+                $("#results1").html("");
+                $("#results").append("<h1>INDICATORS</h1>");
+                $("#child").html("");
+                $.get('../api/indicators/query/'+$(this).val()+'.json', function(json)
+                {
+                    $(json.indicators).each(function(i, data)
+                    {
+									
+                        theId=data.href;
+								       
+									   
+                        var anchor = $("<p class='blue' id='"+theId+"' onclick='javascript:printIt(id)'></p>").append(data.name);
+                                        
+                        $("#results").append(anchor);
+										
+                                        
+                    });
+                });
                         
-        });
-                
-                
-    });
-</script>
+            });
+                     
+        }
+        $.size("#results")
+        function Used()
+            { $("#results").html(""); 
+                $("#results1").html("");
+                $.get('../api/mapViews'+'.json', function(json)
+                {
+					
+						  							
+                    $(json.mapViews).each(function(i, data){
+                        var chartid=data.id;
+                        var charthref=data.href;
+                        var parcent=0;
+                        $.get("../api/mapViews/"+data.id+".json", function(map) {
+				 
+                            $(map.indicator).each(function(i, d){
+					
+                                if($.inArray(d.name, used)==-1){
+						 
+                                    used.push(d.name);
+						 
+                                    var anchor = $("<p class='blue' ></p>").append(d.name);
+                                        
+                                    $("#results1").append(anchor);	
+                                    notused = $(IndArray).not(used).get();
+						
+                                }	
+                            });
+                        });
+                    });
+                });
+								
+            }   
+    </script>
 
-<h1> STATISTICS FOR INDICATORS</h1>
-<div style="float:left;height:100%;">
-    <label for="search">Search Criteria</label>
-    <input type="text" id="search" class="search" />
-    <div id="results"></div>
+    <h1> STATISTICS FOR INDICATORS</h1>
+    <div style="float:left;height:100%;">
+        <!--<label for="search">Search Criteria</label>
+        <input type="text" id="search" class="search" />-->
+        <div id="results"></div>
+    </div>
+    <div>
+        <table>
+            <td><button  onclick="javascript:search2()" style="color: grey; size: 100px"><a href="#" rel="nofollow">INDICATORS</a></button> <br> </td>
+            <td><button onclick="javascript:Used()" style="color: grey; size: 100px"><a href="#" rel="nofollow">USED</a></button> <br></td>
+            <td><button style="color: grey; size: 100px">NOT USED</button></td>
+        </table>
+    </div>
+
+
+
+    <div id="child" style="position:absolute;left:50%;">
+    </div>
+    <div id="results1" style="position:absolute;"></div>
+    <div id="summary" style="background-color:gray; position: absolute;" > 
+    </div>
+    <div id = "section1">
+    </div>
+</div>        
+
+<div id="rightBar">
+    <span id="hideRightBar"><a href="javascript:hideHelpContent()" title="Close">
+            <img id="hideRightBarImg" src="../images/hide.png" alt="Close"/></a>
+    </span>
+    <div id="rightBarContents"/>
 </div>
 
-<div id="child" style="position:absolute;left:50%;">
-</div>
-<div id="summary" style="background-color:gray; position: absolute;" > 
-</div>
+</body>
+</html>
