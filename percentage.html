@@ -17,11 +17,13 @@
         var theId,id;	
         notused =[];
         used=[];
+        indies = [];
         IndArray = [];
         
         maps = false;
         charts = false;
         reports = false;
+        indicators = false;
 	
         function printIt(id)
         {
@@ -106,16 +108,57 @@
             return $(tag, options);
         }
         
-        function getNotUsed(){
-            
+        function doneGetting(){
+            if(maps && charts && reports && indicators){
+                difference = $.grep(indies, function(item){
+                   return $.inArray(item, used) < 0; 
+                });
+                emptyResults();
+                $(difference).each(function(i, data){
+                   addPara(data); 
+                });
+            }
         }
         
-        function getUsed(){
-            
-        }
-        
-        function getIndicators(){
-            
+        function notUsed(){
+            getData('../api/mapViews'+'.json', 'mapViews', function(i, data){
+                getData("../api/mapViews/"+data.id+".json", 'indicator', function(index, d){
+                    if($.inArray(d.name, used)==-1){	 
+                        used.push(d.name);
+                    }
+                });
+            }, function(){
+                maps = true;
+                doneGetting();
+            });
+            getData('../api/charts'+'.json', 'charts', function(i, data){
+                getData("../api/charts/"+data.id+".json", 'indicators', function(index, d){
+                    if($.inArray(d.name, used)==-1){	 
+                        used.push(d.name);
+                    }
+                });
+            }, function(){
+                charts = true;
+                doneGetting();
+            });
+            getData('../api/reports'+'.json', 'reports', function(i, data){
+                getData("../api/reports/"+data.id+".json", 'indicators', function(index, d){
+                    if($.inArray(d.name, used)==-1){	 
+                        used.push(d.name);	
+                    }
+                });
+            }, function(){
+                reports = true;
+                doneGetting();
+            });
+            getData('../api/indicators/query/'+'.json', 'indicators', function(i, data){
+                if($.inArray(data.name, indies)==-1){	 
+                        indies.push(data.name);	
+                    }
+            }, function(){
+                indicators = true;
+                doneGetting();
+            });
         }
         
         function Used()
@@ -190,7 +233,7 @@
         <table>
             <td><button  onclick="javascript:search2()" style="color: grey; size: 100px">INDICATORS</button> <br> </td>
             <td><button onclick="javascript:Used()" style="color: grey; size: 100px">USED</button> <br></td>
-            <td><button style="color: grey; size: 100px">NOT USED</button></td>
+            <td><button onclick="javascript:notUsed()" style="color: grey; size: 100px">NOT USED</button></td>
         </table>
     </div>
 
