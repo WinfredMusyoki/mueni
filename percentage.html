@@ -19,6 +19,9 @@
         used=[];
         IndArray = [];
         
+        maps = false;
+        charts = false;
+        reports = false;
 	
         function printIt(id)
         {
@@ -33,106 +36,160 @@
                     $("#child").append(anchor);
                 });
             });
-        }   
+        }
+        
+        function emptyResults(){
+            $("#results").html("");
+        }
+        
+        function addToResults(something){
+            $("#results").append($(something));
+            console.log("Adding "+something);
+        }
+        
+        function getData(url, field, loopAction, done){
+            done = done || function(){};
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function(json){
+                    $(json[field]).each(function(i,data){
+                        loopAction(i, data);
+                    });
+                    done();
+                }
+            })
+        }
+        
+        function addClickablePara(name, id){
+            var anchor = createItem(name, '<li/>', {'class': 'blue', 'click': printIt(id)});
+            addToResults(anchor);
+        }
 	   	
         function search2(){
-            $("#results").append("<h1>INDICATORS</h1>");
-            $.get('../api/indicators/query/'+'.json', function(json)
-            {
-						     
-                $(json.indicators).each(function(i, data)
-                {
-                    theId=data.href;
-								       
-									   
-                    var anchor = $("<p class='blue' id='"+theId+"' onclick='javascript:printIt(id)'></p>").append(data.name);
-                                        
-                    $("#results").append(anchor);
-                    anchor.bind("click",function(e){
-                        e.preventDefault();
-                        $.get($(this).attr("href")+".json", function(json){
-                            $(json.indicators).each(function(i, d){
-                                var anchor = $("<a></a>").attr("href","#").attr("id",d.name.replace(' ','_')).append(d.name);
-                                alert($(json.indicators).length);
-                                $("#section1").append(anchor).append("<br/>");
-
-                            });
-
-                        });
-                    });
-										
-                                        
-                });
+            emptyResults();
+            
+            getData('../api/indicators/query/'+'.json', 'indicators', function(i, data){
+                theId=data.href;
+                
+                addClickablePara(data.name);
+//                var anchor = $("<p class='blue' id='"+theId+"' onclick='javascript:printIt(id)'></p>").append(data.name);
+//                
+//                $("#results").append(anchor);
+                //                    anchor.bind("click",function(e){
+                //                        e.preventDefault();
+                //                        $.get($(this).attr("href")+".json", function(json){
+                //                            $(json.indicators).each(function(i, d){
+                //                                var anchor = $("<a></a>").attr("href","#").attr("id",d.name.replace(' ','_')).append(d.name);
+                //                                alert($(json.indicators).length);
+                //                                $("#section1").append(anchor).append("<br/>");
+                //                            
+                //                            });
+                //                        
+                //                        });
+                //                    });F
             });
-            $("#search").keyup(function(){
-	
-                $("#results").html("");
-                $("#results1").html("");
-                $("#results").append("<h1>INDICATORS</h1>");
-                $("#child").html("");
-                $.get('../api/indicators/query/'+$(this).val()+'.json', function(json)
-                {
-                    $(json.indicators).each(function(i, data)
-                    {
-									
-                        theId=data.href;
-								       
-									   
-                        var anchor = $("<p class='blue' id='"+theId+"' onclick='javascript:printIt(id)'></p>").append(data.name);
-                                        
-                        $("#results").append(anchor);
-										
-                                        
-                    });
-                });
-                        
-            });
-                     
+                                
         }
-        $.size("#results")
+        
+        function addPara(name){
+//            var anchor = $("<li class='blue' ></li>").append(name);
+            var anchor = createItem(name, '<li/>', {'class': 'blue'});
+            addToResults(anchor);
+//            console.log(anchor);
+        }
+        
+        function createItem(name, tag, options){
+            tag = tag || '<li/>';
+            options = options || {};
+            options['text'] = name || options['text'] || '';
+            return $(tag, options);
+        }
+        
+        function getNotUsed(){
+            
+        }
+        
+        function getUsed(){
+            
+        }
+        
+        function getIndicators(){
+            
+        }
+        
         function Used()
-            { $("#results").html(""); 
-                $("#results1").html("");
-                $.get('../api/mapViews'+'.json', function(json)
-                {
-					
-						  							
-                    $(json.mapViews).each(function(i, data){
-                        var chartid=data.id;
-                        var charthref=data.href;
-                        var parcent=0;
-                        $.get("../api/mapViews/"+data.id+".json", function(map) {
-				 
-                            $(map.indicator).each(function(i, d){
-					
-                                if($.inArray(d.name, used)==-1){
-						 
-                                    used.push(d.name);
-						 
-                                    var anchor = $("<p class='blue' ></p>").append(d.name);
-                                        
-                                    $("#results1").append(anchor);	
-                                    notused = $(IndArray).not(used).get();
-						
-                                }	
-                            });
-                        });
-                    });
+        { 
+            emptyResults();
+            used = [];
+            
+            getData('../api/mapViews'+'.json', 'mapViews', function(i, data){
+                getData("../api/mapViews/"+data.id+".json", 'indicator', function(index, d){
+                    if($.inArray(d.name, used)==-1){	 
+                        used.push(d.name);
+                        addPara(d.name);
+                    }
                 });
-								
-            }   
+            });
+            getData('../api/charts'+'.json', 'charts', function(i, data){
+                getData("../api/charts/"+data.id+".json", 'indicators', function(index, d){
+                    if($.inArray(d.name, used)==-1){	 
+                        used.push(d.name);
+                        addPara(d.name);
+                    }
+                });
+            });
+            getData('../api/reports'+'.json', 'reports', function(i, data){
+                getData("../api/reports/"+data.id+".json", 'indicators', function(index, d){
+                    if($.inArray(d.name, used)==-1){	 
+                        used.push(d.name);	
+                        addPara(d.name);
+                    }
+                });
+            });
+            
+            //            $(used).each(function(i,item){
+            //                var anchor = $("<p class='blue' ></p>").append(item);
+            //                addToResults(anchor);
+            //                console.log(anchor);
+            //            });
+            //            $.get('../api/mapViews'+'.json', function(json)
+            //            {
+            //									  							
+            //                $(json.mapViews).each(function(i, data){
+            //                    var mapid=data.id;
+            //                    var maphref=data.href;
+            //                    $.get("../api/mapViews/"+data.id+".json", function(map) {
+            //				 
+            //                        $(map.indicator).each(function(i, d){
+            //					
+            //                            if($.inArray(d.name, used)==-1){
+            //						 
+            //                                used.push(d.name);
+            //						 
+            //                                var anchor = $("<p class='blue' ></p>").append(d.name);
+            //                                        
+            //                                $("#results").append(anchor);	
+            //                                notused = $(IndArray).not(used).get();
+            //						
+            //                            }	
+            //                        });
+            //                    });
+            //                });
+            //            });							
+        }   
     </script>
 
     <h1> STATISTICS FOR INDICATORS</h1>
     <div style="float:left;height:100%;">
         <!--<label for="search">Search Criteria</label>
         <input type="text" id="search" class="search" />-->
-        <div id="results"></div>
+        <ol id="results"></ol>
     </div>
     <div>
         <table>
-            <td><button  onclick="javascript:search2()" style="color: grey; size: 100px"><a href="#" rel="nofollow">INDICATORS</a></button> <br> </td>
-            <td><button onclick="javascript:Used()" style="color: grey; size: 100px"><a href="#" rel="nofollow">USED</a></button> <br></td>
+            <td><button  onclick="javascript:search2()" style="color: grey; size: 100px">INDICATORS</button> <br> </td>
+            <td><button onclick="javascript:Used()" style="color: grey; size: 100px">USED</button> <br></td>
             <td><button style="color: grey; size: 100px">NOT USED</button></td>
         </table>
     </div>
@@ -141,7 +198,6 @@
 
     <div id="child" style="position:absolute;left:50%;">
     </div>
-    <div id="results1" style="position:absolute;"></div>
     <div id="summary" style="background-color:gray; position: absolute;" > 
     </div>
     <div id = "section1">
