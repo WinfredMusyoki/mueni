@@ -17,6 +17,7 @@
         var theId,id;	
         notused =[];
         used=[];
+        usedD=[];
         indies = [];
         indArray = [];
         
@@ -46,7 +47,7 @@
         }
         
         function addToResults(something){
-            $("#results").append($(something));
+            $("#results").append("<br/>").append($(something));
             console.log("Adding "+something);
         }
         
@@ -76,6 +77,7 @@
                 theId=data.href;
                 
                 addClickablePara(data.name);
+                
             });
                                 
         }
@@ -125,8 +127,8 @@
                 charts = true;
                 doneGetting();
             });
-            getData('../api/reports'+'.json', 'reports', function(i, data){
-                getData("../api/reports/"+data.id+".json", 'indicators', function(index, d){
+            getData('../api/reportTables'+'.json', 'reportTables', function(i, data){
+                getData("../api/reportTables/"+data.id+".json", 'indicators', function(index, d){
                     if($.inArray(d.name, used)==-1){	 
                         used.push(d.name);	
                     }
@@ -166,8 +168,8 @@
                     }
                 });
             });
-            getData('../api/reports'+'.json', 'reports', function(i, data){
-                getData("../api/reports/"+data.id+".json", 'indicators', function(index, d){
+            getData('../api/reportTables'+'.json', 'reportTables', function(i, data){
+                getData("../api/reportTables/"+data.id+".json", 'indicators', function(index, d){
                     if($.inArray(d.name, used)==-1){	 
                         used.push(d.name);	
                         addPara(d.name);
@@ -178,24 +180,57 @@
         }   
         function percentage()
         {
+            //            Used();
+            //            notUsed();
             emptyResults();
             percentused=((used.length/indies.length)*100); 
             percentnot=((100-(percentused))); 
-            $('#results').append(("Percentage used=")+percentused)
-            $("#child").append(("Percentage not used=")+percentnot);
+            $('#results').append("<br/>").append(("Percentage used=")+percentused).append("<br/>");
+            $("#results").append("<br/>").append(("Percentage not used=")+percentnot);
             
         }
         function dataElements()
         {
             emptyResults();
             
-            getData('../api/dataElements/query/'+'.json', 'dataelement', function(i, data){
+            getData('../api/dataElements/query/'+'.json', 'dataElements', function(i, data){
                 theId=data.href;
                 
                 addClickablePara(data.name);
+                
             });
-            
         }
+        function UsedD()
+        { 
+            emptyResults();
+            used = [];
+            
+            getData('../api/mapViews'+'.json', 'mapViews', function(i, data){
+                getData("../api/mapViews/"+data.id+".json", 'dataElements', function(index, d){
+                    if($.inArray(d.name, used)==-1){	 
+                        used.push(d.name);
+                        addPara(d.name);
+                    }
+                });
+            });
+            getData('../api/charts'+'.json', 'charts', function(i, data){
+                getData("../api/charts/"+data.id+".json", 'dataElements', function(index, d){
+                    if($.inArray(d.name, used)==-1){	 
+                        used.push(d.name);
+                        addPara(d.name);
+                    }
+                });
+            });
+            getData('../api/reportTables'+'.json', 'reportTables', function(i, data){
+                getData("../api/reportTables/"+data.id+".json", 'dataElements', function(index, d){
+                    if($.inArray(d.name, used)==-1){	 
+                        used.push(d.name);	
+                        addPara(d.name);
+                    }
+                });
+            });
+            				
+        }   
         
     </script>
 
@@ -209,10 +244,23 @@
             <td><button onclick="javascript:Used()" style="color: grey; size: 100px">USED</button> <br></td>
             <td><button onclick="javascript:notUsed()" style="color: grey; size: 100px">NOT USED</button></td>
             <td><button onclick="javascript:percentage()" style="color: grey; size: 100px">PERCENTAGE</button></td>
-            <td><button  onclick="javascript:dataElements()" style="color: grey; size: 100px">DATA ELEMENTS</button> <br> </td>
-
         </table>
+        <div style="float:left;height:100%;">
+            <ol id="results"></ol>
+        </div>
     </div>
+    <div>
+        <table>
+            <td><button  onclick="javascript:dataElements()" style="color: grey; size: 100px">DATA ELEMENTS</button> <br> </td>
+            <td><button onclick="javascript:UsedD()" style="color: grey; size: 100px">USED</button> <br></td>
+            <td><button onclick="javascript:notUsed()" style="color: grey; size: 100px">NOT USED</button></td>
+            <td><button onclick="javascript:percentage()" style="color: grey; size: 100px">PERCENTAGE</button></td>
+        </table>
+        <div style="float:left;height:100%;">
+            <ol id="results"></ol>
+        </div>
+    </div>
+
 
 
 
