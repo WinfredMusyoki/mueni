@@ -75,30 +75,13 @@
                 theId=data.href;
                 
                 addClickablePara(data.name);
-//                var anchor = $("<p class='blue' id='"+theId+"' onclick='javascript:printIt(id)'></p>").append(data.name);
-//                
-//                $("#results").append(anchor);
-                //                    anchor.bind("click",function(e){
-                //                        e.preventDefault();
-                //                        $.get($(this).attr("href")+".json", function(json){
-                //                            $(json.indicators).each(function(i, d){
-                //                                var anchor = $("<a></a>").attr("href","#").attr("id",d.name.replace(' ','_')).append(d.name);
-                //                                alert($(json.indicators).length);
-                //                                $("#section1").append(anchor).append("<br/>");
-                //                            
-                //                            });
-                //                        
-                //                        });
-                //                    });F
             });
                                 
         }
         
         function addPara(name){
-//            var anchor = $("<li class='blue' ></li>").append(name);
             var anchor = createItem(name, '<li/>', {'class': 'blue'});
             addToResults(anchor);
-//            console.log(anchor);
         }
         
         function createItem(name, tag, options){
@@ -190,43 +173,12 @@
                     }
                 });
             });
-            
-            //            $(used).each(function(i,item){
-            //                var anchor = $("<p class='blue' ></p>").append(item);
-            //                addToResults(anchor);
-            //                console.log(anchor);
-            //            });
-            //            $.get('../api/mapViews'+'.json', function(json)
-            //            {
-            //									  							
-            //                $(json.mapViews).each(function(i, data){
-            //                    var mapid=data.id;
-            //                    var maphref=data.href;
-            //                    $.get("../api/mapViews/"+data.id+".json", function(map) {
-            //				 
-            //                        $(map.indicator).each(function(i, d){
-            //					
-            //                            if($.inArray(d.name, used)==-1){
-            //						 
-            //                                used.push(d.name);
-            //						 
-            //                                var anchor = $("<p class='blue' ></p>").append(d.name);
-            //                                        
-            //                                $("#results").append(anchor);	
-            //                                notused = $(IndArray).not(used).get();
-            //						
-            //                            }	
-            //                        });
-            //                    });
-            //                });
-            //            });							
+            				
         }   
     </script>
 
     <h1> STATISTICS FOR INDICATORS</h1>
     <div style="float:left;height:100%;">
-        <!--<label for="search">Search Criteria</label>
-        <input type="text" id="search" class="search" />-->
         <ol id="results"></ol>
     </div>
     <div>
