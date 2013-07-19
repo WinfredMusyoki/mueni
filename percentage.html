@@ -18,7 +18,7 @@
         notused =[];
         used=[];
         indies = [];
-        IndArray = [];
+        indArray = [];
         
         maps = false;
         charts = false;
@@ -42,6 +42,7 @@
         
         function emptyResults(){
             $("#results").html("");
+            $("#child").html("");
         }
         
         function addToResults(something){
@@ -68,7 +69,7 @@
             addToResults(anchor);
         }
 	   	
-        function search2(){
+        function search(){
             emptyResults();
             
             getData('../api/indicators/query/'+'.json', 'indicators', function(i, data){
@@ -94,11 +95,11 @@
         function doneGetting(){
             if(maps && charts && reports && indicators){
                 difference = $.grep(indies, function(item){
-                   return $.inArray(item, used) < 0; 
+                    return $.inArray(item, used) < 0; 
                 });
                 emptyResults();
                 $(difference).each(function(i, data){
-                   addPara(data); 
+                    addPara(data); 
                 });
             }
         }
@@ -136,8 +137,8 @@
             });
             getData('../api/indicators/query/'+'.json', 'indicators', function(i, data){
                 if($.inArray(data.name, indies)==-1){	 
-                        indies.push(data.name);	
-                    }
+                    indies.push(data.name);	
+                }
             }, function(){
                 indicators = true;
                 doneGetting();
@@ -175,6 +176,27 @@
             });
             				
         }   
+        function percentage()
+        {
+            emptyResults();
+            percentused=((used.length/indies.length)*100); 
+            percentnot=((100-(percentused))); 
+            $('#results').append(("Percentage used=")+percentused)
+            $("#child").append(("Percentage not used=")+percentnot);
+            
+        }
+        function dataElements()
+        {
+            emptyResults();
+            
+            getData('../api/dataElements/query/'+'.json', 'dataelement', function(i, data){
+                theId=data.href;
+                
+                addClickablePara(data.name);
+            });
+            
+        }
+        
     </script>
 
     <h1> STATISTICS FOR INDICATORS</h1>
@@ -183,9 +205,12 @@
     </div>
     <div>
         <table>
-            <td><button  onclick="javascript:search2()" style="color: grey; size: 100px">INDICATORS</button> <br> </td>
+            <td><button  onclick="javascript:search()" style="color: grey; size: 100px">INDICATORS</button> <br> </td>
             <td><button onclick="javascript:Used()" style="color: grey; size: 100px">USED</button> <br></td>
             <td><button onclick="javascript:notUsed()" style="color: grey; size: 100px">NOT USED</button></td>
+            <td><button onclick="javascript:percentage()" style="color: grey; size: 100px">PERCENTAGE</button></td>
+            <td><button  onclick="javascript:dataElements()" style="color: grey; size: 100px">DATA ELEMENTS</button> <br> </td>
+
         </table>
     </div>
 
