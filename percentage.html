@@ -288,7 +288,8 @@
             reports = true;
             doneGettingD();
         });
-        getData('../api/dataElements/query/'+'.json', 'dataElements', function(i, data){
+        for(var x=1;x<=11;x++){
+        getData('../api/dataElements.json?page=' +x, 'dataElements', function(i, data){
             if($.inArray(data.name, dataElem)==-1){	 
                 dataElem.push(data.name);	
             }
@@ -296,7 +297,7 @@
             dataElements = true;
             doneGetting();
         });
-    }
+    }}
         
         
     </script>
