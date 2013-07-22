@@ -19,12 +19,14 @@
         used=[];
         usedD=[];
         indies = [];
+        dataElem=[];
         indArray = [];
         
         maps = false;
         charts = false;
         reports = false;
         indicators = false;
+        dataElements=false;
 	
         function printIt(id)
         {
@@ -106,6 +108,17 @@
             }
         }
         
+        function doneGettingD(){
+            if(maps && charts && reports && dataElements){
+                difference = $.grep(dataElem, function(item){
+                    return $.inArray(item, usedD) < 0; 
+                });
+                emptyResults();
+                $(difference).each(function(i, data){
+                    addPara(data); 
+                });
+            }
+        }
         function notUsed(){
             getData('../api/mapViews'+'.json', 'mapViews', function(i, data){
                 getData("../api/mapViews/"+data.id+".json", 'indicator', function(index, d){
@@ -154,83 +167,137 @@
             
             getData('../api/mapViews'+'.json', 'mapViews', function(i, data){
                 getData("../api/mapViews/"+data.id+".json", 'indicator', function(index, d){
-                    if($.inArray(d.name, used)==-1){	 
-                        used.push(d.name);
-                        addPara(d.name);
-                    }
-                });
+                    //                    if($.inArray(d.name, used)==-1){	 
+                    //                        used.push(d.name);
+                    //                        $(json.indicatorGroups).each(function(i, data){
+                    //                        var anchor = $("<a></a>").attr("href",data.href).attr("id",data.name.replace(' ','_')).append(data.name);
+                    //                        click();
+                    //                        });
+                    used.push(d.name);
+                    addPara(d.name);
+                //}
             });
-            getData('../api/charts'+'.json', 'charts', function(i, data){
-                getData("../api/charts/"+data.id+".json", 'indicators', function(index, d){
-                    if($.inArray(d.name, used)==-1){	 
-                        used.push(d.name);
-                        addPara(d.name);
-                    }
-                });
+        });
+        getData('../api/charts'+'.json', 'charts', function(i, data){
+            getData("../api/charts/"+data.id+".json", 'indicators', function(index, d){
+                if($.inArray(d.name, used)==-1){	 
+                    used.push(d.name);
+                    addPara(d.name);
+                }
             });
-            getData('../api/reportTables'+'.json', 'reportTables', function(i, data){
-                getData("../api/reportTables/"+data.id+".json", 'indicators', function(index, d){
-                    if($.inArray(d.name, used)==-1){	 
-                        used.push(d.name);	
-                        addPara(d.name);
-                    }
-                });
+        });
+        getData('../api/reportTables'+'.json', 'reportTables', function(i, data){
+            getData("../api/reportTables/"+data.id+".json", 'indicators', function(index, d){
+                if($.inArray(d.name, used)==-1){	 
+                    used.push(d.name);	
+                    addPara(d.name);
+                }
             });
+        });
             				
-        }   
-        function percentage()
-        {
-            //            Used();
-            //            notUsed();
-            emptyResults();
-            percentused=((used.length/indies.length)*100); 
-            percentnot=((100-(percentused))); 
-            $('#results').append("<br/>").append(("Percentage used=")+percentused).append("<br/>");
-            $("#results").append("<br/>").append(("Percentage not used=")+percentnot);
-            
-        }
-        function dataElements()
-        {
-            emptyResults();
-            
-            getData('../api/dataElements/query/'+'.json', 'dataElements', function(i, data){
-                theId=data.href;
-                
-                addClickablePara(data.name);
-                
-            });
-        }
-        function UsedD()
-        { 
-            emptyResults();
-            used = [];
-            
+    }  
+    function click()
+    {
+        anchor.bind("click",function(e){
+            e.preventDefault();
             getData('../api/mapViews'+'.json', 'mapViews', function(i, data){
-                getData("../api/mapViews/"+data.id+".json", 'dataElements', function(index, d){
-                    if($.inArray(d.name, used)==-1){	 
-                        used.push(d.name);
-                        addPara(d.name);
-                    }
-                });
             });
-            getData('../api/charts'+'.json', 'charts', function(i, data){
-                getData("../api/charts/"+data.id+".json", 'dataElements', function(index, d){
-                    if($.inArray(d.name, used)==-1){	 
-                        used.push(d.name);
-                        addPara(d.name);
-                    }
-                });
+        });
+    }
+    function percentage()
+    {
+        //            Used();
+        //            notUsed();
+        emptyResults();
+        percentused=((used.length/indies.length)*100); 
+        percentnot=((100-(percentused))); 
+        $('#results').append("<br/>").append(("Percentage used=")+percentused).append("<br/>");
+        $("#results").append("<br/>").append(("Percentage not used=")+percentnot);
+            
+    }
+    function dataElement()
+    {
+        emptyResults();
+        for(var x=1;x<=11;x++)
+        {
+            getData('../api/dataElements.json?page='+x, 'dataElements', function(i, data){
+                theId=data.href;
+                addClickablePara(data.name);
             });
-            getData('../api/reportTables'+'.json', 'reportTables', function(i, data){
-                getData("../api/reportTables/"+data.id+".json", 'dataElements', function(index, d){
-                    if($.inArray(d.name, used)==-1){	 
-                        used.push(d.name);	
-                        addPara(d.name);
-                    }
-                });
+        }
+    }
+    function UsedD()
+    { 
+        emptyResults();
+        usedD = [];
+            
+        getData('../api/mapViews'+'.json', 'mapViews', function(i, data){
+            getData("../api/mapViews/"+data.id+".json", 'dataElements', function(index, d){
+                if($.inArray(d.name, usedD)==-1){	 
+                    usedD.push(d.name);
+                    addPara(d.name);
+                }
             });
+        });
+        getData('../api/charts'+'.json', 'charts', function(i, data){
+            getData("../api/charts/"+data.id+".json", 'dataElements', function(index, d){
+                if($.inArray(d.name, usedD)==-1){	 
+                    usedD.push(d.name);
+                    addPara(d.name);
+                }
+            });
+        });
+        getData('../api/reportTables'+'.json', 'reportTables', function(i, data){
+            getData("../api/reportTables/"+data.id+".json", 'dataElements', function(index, d){
+                if($.inArray(d.name, usedD)==-1){	 
+                    usedD.push(d.name);	
+                    addPara(d.name);
+                }
+            });
+        });
             				
-        }   
+    }   
+    function notUsedD(){
+        getData('../api/mapViews'+'.json', 'mapViews', function(i, data){
+            getData("../api/mapViews/"+data.id+".json", 'dataElements', function(index, d){
+                if($.inArray(d.name, usedD)==-1){	 
+                    usedD.push(d.name);
+                }
+            });
+        }, function(){
+            maps = true;
+            doneGettingD();
+        });
+        getData('../api/charts'+'.json', 'charts', function(i, data){
+            getData("../api/charts/"+data.id+".json", 'dataElements', function(index, d){
+                if($.inArray(d.name, usedD)==-1){	 
+                    usedD.push(d.name);
+                }
+            });
+        }, function(){
+            charts = true;
+            doneGettingD();
+        });
+        getData('../api/reportTables'+'.json', 'reportTables', function(i, data){
+            getData("../api/reportTables/"+data.id+".json", 'dataElements', function(index, d){
+                if($.inArray(d.name, usedD)==-1){	 
+                    usedD.push(d.name);	
+                }
+            });
+        }, function(){
+            reports = true;
+            doneGettingD();
+        });
+        getData('../api/dataElements/query/'+'.json', 'dataElements', function(i, data){
+            if($.inArray(data.name, dataElem)==-1){	 
+                dataElem.push(data.name);	
+            }
+        }, function(){
+            dataElements = true;
+            doneGetting();
+        });
+    }
+        
         
     </script>
 
@@ -251,9 +318,9 @@
     </div>
     <div>
         <table>
-            <td><button  onclick="javascript:dataElements()" style="color: grey; size: 100px">DATA ELEMENTS</button> <br> </td>
+            <td><button  onclick="javascript:dataElement()" style="color: grey; size: 100px">DATA ELEMENTS</button> <br> </td>
             <td><button onclick="javascript:UsedD()" style="color: grey; size: 100px">USED</button> <br></td>
-            <td><button onclick="javascript:notUsed()" style="color: grey; size: 100px">NOT USED</button></td>
+            <td><button onclick="javascript:notUsedD()" style="color: grey; size: 100px">NOT USED</button></td>
             <td><button onclick="javascript:percentage()" style="color: grey; size: 100px">PERCENTAGE</button></td>
         </table>
         <div style="float:left;height:100%;">
